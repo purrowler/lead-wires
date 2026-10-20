@@ -17,14 +17,19 @@ public final class NMSUtil {
 		String name = Bukkit.getServer().getClass().getName();
 
 		if (name.equals("org.bukkit.craftbukkit.CraftServer")) {
-			// Example: "1.21-R0.1-SNAPSHOT"
 			String bukkitVersion = Bukkit.getBukkitVersion();
-			// Example: ["1", "21"]
-			String[] versionParts = bukkitVersion.split("-")[0].split("\\.");
+			Matcher matcher = Pattern.compile("^(\\d+)\\.(\\d+)(?:\\.(\\d+))?").matcher(bukkitVersion);
+			if (!matcher.find()) {
+				throw new IllegalStateException("Invalid server version \"" + bukkitVersion + "\"");
+			}
 
-			VERSION = bukkitVersion.split("-")[0];
-			MINOR = Integer.parseInt(versionParts[1]);
-			RELEASE = versionParts.length > 2 ? Integer.parseInt(versionParts[2]) : 0;
+			int major = Integer.parseInt(matcher.group(1));
+			int minor = Integer.parseInt(matcher.group(2));
+			int patch = matcher.group(3) != null ? Integer.parseInt(matcher.group(3)) : 0;
+
+			VERSION = matcher.group();
+			MINOR = major == 1 ? minor : major;
+			RELEASE = major == 1 ? patch : minor;
 		} else {
 			VERSION = name.substring(23, name.lastIndexOf('.'));
 			Pattern pattern = Pattern.compile("v1_(\\d{1,2})_R(\\d{1,2})");
@@ -45,7 +50,7 @@ public final class NMSUtil {
 	}
 
 	/**
-	 * @return Minor server version, for example '14' from 'v1_14_R1'.
+	 * @return Minor server version, for example '14' from 'v1_14_R1', the year for year-based versions: '26' from '26.3'
 	 */
 	public static int getMinorVersion() {
 		return MINOR;

@@ -21,24 +21,27 @@ public final class EntityId {
 		try {
 			boolean v17 = NMSUtil.getMinorVersion() >= 17;
 
-			Class<?> entityClass = NMSUtil.getNMSClass(v17 ? "world.entity.Entity" : "Entity");
-
 			Field field = null;
 
 			if (v17) {
-				for (Field f : entityClass.getDeclaredFields()) {
-					if (f.getType() == AtomicInteger.class && (f.getModifiers() & Modifier.STATIC) != 0) {
-						field = f;
+				for (String className : new String[] {"world.entity.Entity", "server.level.ServerLevel"}) {
+					for (Field f : NMSUtil.getNMSClass(className).getDeclaredFields()) {
+						if (f.getType() == AtomicInteger.class && (f.getModifiers() & Modifier.STATIC) != 0) {
+							field = f;
 
+							break;
+						}
+					}
+					if (field != null) {
 						break;
 					}
 				}
 
 				if (field == null) {
-					throw new IllegalStateException("AtomicInteger field not found in Entity class");
+					throw new IllegalStateException("AtomicInteger field not found in Entity or ServerLevel class");
 				}
 			} else {
-				field = entityClass.getDeclaredField("entityCount");
+				field = NMSUtil.getNMSClass("Entity").getDeclaredField("entityCount");
 			}
 
 			field.setAccessible(true);

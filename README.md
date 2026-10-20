@@ -12,7 +12,7 @@ Download: [GitHub Releases](https://github.com/saharNooby/lead-wires/releases)
 
 To build, you need:
 - Maven
-- JDK 8
+- JDK 25
 - `buildSettings.properties` file with `outputDir` property set to path where you want the JAR to appear
 
 `git clone` the repository, `cd` into its dir and run `mvn clean install`.
